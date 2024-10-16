@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Тег IFRAME</title>
+    <title>KartChrono Wrapper</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         html, body {
@@ -47,14 +47,27 @@
         function showSessions() {
             $('#mainFrame').attr('src', '/home/getSessionsList');
         }
-        $('#changeSrc').click(function () {
-            $('#mainFrame').attr('src', '/home/getSessionsList');
-        });
+        function showMainPage() {
+            $('#mainFrame').attr('src', 'https://stkmotor.kartchrono.com/online/?variant=monitor');
+        }
     </script>
+    <link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/colors.css?v=1690359523'/>
+    <link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/main.css?v=1696430736'/>
 </head>
 <body>
-    <p><a href="#" onclick="saveSession(); return false;">Сохранить заезд</a></p>
-    <p><a href="#" onclick="showSessions(); return false;">Список сохранённых заездов</a></p>
+    <div id="buttons">
+            <!--p><a class="buttonLink" href="#" onclick="saveSession(); return false;" style="color:#ffffff;font-family: roboto condensed;">Сохранить заезд</a></p>
+            <p><a class="buttonLink" href="#" onclick="showSessions(); return false;" style="color:#ffffff;font-family: roboto condensed;">Список сохранённых заездов</a></p-->
+        <div class="buttonContainer">
+            <a class="buttonLink" href="#" onclick="showMainPage(); return false;" >Главная</a>
+        </div>
+        <div class="buttonContainer">
+            <a class="buttonLink" href="#" onclick="saveSession(); return false;" >Сохранить заезд</a>
+        </div>
+        <div class="buttonContainer">
+            <a class="buttonLink" href="#" onclick="showSessions(); return false;" >Сохранённые заезды</a>
+        </div>
+    </div>
     <button id="changeSrc">Список сохранённых заездов</button>
     <iframe id="mainFrame" src="https://stkmotor.kartchrono.com/online/?variant=monitor" align="left">
         Ваш браузер не поддерживает плавающие фреймы!
