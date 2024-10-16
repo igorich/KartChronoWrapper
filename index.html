@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Тег IFRAME</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         html, body {
             height: 100%;
@@ -26,8 +27,8 @@
         }
     </style>
     <script>
-        function saveRace() {
-            fetch('/home/saveRace', {
+        function saveSession() {
+            fetch('/home/saveSession', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -43,12 +44,19 @@
                 })
                 .catch(error => console.error('Ошибка:', error));
         }
+        function showSessions() {
+            $('#mainFrame').attr('src', '/home/getSessionsList');
+        }
+        $('#changeSrc').click(function () {
+            $('#mainFrame').attr('src', '/home/getSessionsList');
+        });
     </script>
 </head>
 <body>
-    <p><a href="#" onclick="saveRace(); return false;">Сохранить заезд</a></p>
-    <p><a href="tip.html">Список сохранённых заездов</a></p>
-    <iframe src="https://stkmotor.kartchrono.com/online/?variant=monitor" align="left">
+    <p><a href="#" onclick="saveSession(); return false;">Сохранить заезд</a></p>
+    <p><a href="#" onclick="showSessions(); return false;">Список сохранённых заездов</a></p>
+    <button id="changeSrc">Список сохранённых заездов</button>
+    <iframe id="mainFrame" src="https://stkmotor.kartchrono.com/online/?variant=monitor" align="left">
         Ваш браузер не поддерживает плавающие фреймы!
     </iframe>
 </body>

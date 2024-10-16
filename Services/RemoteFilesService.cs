@@ -1,17 +1,18 @@
 ﻿using System.Net;
+using System.Text;
 
 namespace KartChronoWrapper.Services
 {
     public interface IRemoteFilesService
     {
-        Task SaveCurrentRace();
+        Task SaveCurrentSession();
         Task <IEnumerable<string>> GetList();
+        string WrapToPage(IEnumerable<string> sessions);
     }
 
     public class RemoteFilesService : IRemoteFilesService
     {
-
-        public async Task SaveCurrentRace()
+        public async Task SaveCurrentSession()
         {
             //
             var url = "https://stkmotor.kartchrono.com/online/?variant=monitor";
@@ -28,16 +29,15 @@ namespace KartChronoWrapper.Services
                     return;
 
                 var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                content = oVerwriteStylesLinks(content);
+                content = OverwriteStylesLinks(content);
 
                 await File.WriteAllTextAsync(
                     Path.Combine(GetCurrentStorageFolder(), $"Заезд-{new Random().Next(1, 10)}.html"),
                     content);
             }
-
         }
 
-        private string oVerwriteStylesLinks(string content)
+        private string OverwriteStylesLinks(string content)
         {
             return content.Replace("href='/css/", "href='https://stkmotor.kartchrono.com/css/");
         }
@@ -47,6 +47,18 @@ namespace KartChronoWrapper.Services
             var dir = new DirectoryInfo(GetCurrentStorageFolder());
 
             return dir.EnumerateFiles().Select(i => i.Name);
+        }
+
+        public string WrapToPage(IEnumerable<string> sessions)
+        {
+            var header = "<!DOCTYPE HTML>\r\n<html>\r\n<head>\r\n    <meta charset=\"utf-8\">\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/colors.css?v=1690359523'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/scoreboard2.css?v=1727079568'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/osd-stream.css?v=1694183475'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/nav.css?v=1632461511'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/records.css?v=1670413288'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/archive.css?v=1632316200'/>\r\n</head>\r\n<body>\r\n";
+            var footer= "</body>\r\n</html>";
+            var body = new StringBuilder();
+            foreach (var i in sessions)
+            {
+                body.Append($"<p><a href=\"getSession?date={DateTime.Today.ToShortDateString()}&name={i}\" >{i}</a></p>");
+            }
+            return header + body.ToString() + footer;
         }
 
         private string GetCurrentStorageFolder()

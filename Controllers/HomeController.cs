@@ -5,7 +5,7 @@ namespace KartChronoWrapper.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class HomeController : Controller //Base
+    public class HomeController : Controller
     {
         private IRemoteFilesService _remoteFilesService;
         public HomeController()
@@ -16,38 +16,44 @@ namespace KartChronoWrapper.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            /*Stream stream = new FileStream("index.html", FileMode.Open);
-            if (stream == null)
-                return NotFound();
-            return File(stream, "text/html", "index.html");*/
-            //return File("index.html", "text/html");
             var filePath = Path.Combine("index.html");
             if (!System.IO.File.Exists(filePath))
             {
                 return NotFound("HTML файл не найден.");
             }
             var htmlContent = await System.IO.File.ReadAllTextAsync(filePath);
+
             return Content(htmlContent, "text/html");
         }
 
-        [HttpPost("SaveRace")]
-        public IActionResult SaveRace()
+        [HttpPost("SaveSession")]
+        public IActionResult SaveSession()
         {
-            _remoteFilesService.SaveCurrentRace();
+            _remoteFilesService.SaveCurrentSession();
             return this.Ok();
         }
 
-        [HttpGet("GetRacesList")]
-        public IActionResult GetRacesList()
+        [HttpGet("GetSessionsList")]
+        public async Task<IActionResult> GetSessionsList()
         {
-            var list = _remoteFilesService.GetList();
-            return this.Ok(list);
+            var list = await _remoteFilesService.GetList();
+            var htmlContent = _remoteFilesService.WrapToPage(list);
+
+            return Content(htmlContent, "text/html");
         }
 
-        [HttpGet("GetRace/")]
-        public IActionResult GetRace()
+        [HttpGet("GetSession")]
+        public async Task<IActionResult> GetSession([FromQuery]string name, string strDate)
         {
-            return this.Ok();
+            var date = DateTime.Parse(strDate);
+            var filePath = Path.Combine($"storage\\{date.ToShortDateString()}\\{name}");
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("HTML файл не найден.");
+            }
+            var htmlContent = await System.IO.File.ReadAllTextAsync(filePath);
+
+            return Content(htmlContent, "text/html");
         }
     }
 }
