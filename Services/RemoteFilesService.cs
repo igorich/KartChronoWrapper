@@ -5,36 +5,67 @@ namespace KartChronoWrapper.Services
 {
     public interface IRemoteFilesService
     {
-        Task SaveCurrentSession();
+        Task SaveCurrentSession(List<PilotProfile> htmlContent);
         Task <IEnumerable<string>> GetList();
-        string WrapToPage(IEnumerable<string> sessions);
+        Task<string> WrapToPage(IEnumerable<string> sessions);
     }
 
     public class RemoteFilesService : IRemoteFilesService
     {
-        public async Task SaveCurrentSession()
+        public string SaveCurrentSession1(List<PilotProfile> data)
         {
-            //
-            var url = "https://stkmotor.kartchrono.com/online/?variant=monitor";
-            using (var client = new HttpClient())
+            var template = File.ReadAllText("WebPages/SessionResults.html");
+            var body = new StringBuilder();
+            //foreach (var i in data)
+            for(int i = 0; i< data.Count(); ++i)
             {
-                client.DefaultRequestHeaders.Accept.Clear();
-                var response = await client.GetAsync(url).ConfigureAwait(false);
-                if (response.StatusCode != HttpStatusCode.OK)
+                var str = "<div id=\"dataRow\" class=\"dataRow compid-1001 oddRow totalBest\" style=\"display: flex; position: static\" ontransitionend=\"resetZIndex(this);\">\r\n" +
+                    $"    <div id=\"pos\" class=\"resultsCell totalBest\">{i}</div>\r\n" +
+                    $"    <div id=\"num\" class=\"resultsCell\">{data[i].KartNo}</div>\r\n" +
+                    "    <div class=\"resultsCell compositeNameSectors \">\r\n" +
+                    "        <div class=\"compositeNameSectorsInner\">\r\n" +
+                    "            <div class=\"innerNameSectorsCell\" id=\"teamContainer\">\r\n" +
+                    "                <div id=\"team\" class=\"innerNameValue hidden\">&nbsp;</div>\r\n" +
+                    "            </div>\r\n" +
+                    "            <div class=\"innerNameSectorsCell\" id=\"nameContainer\">\r\n" +
+                    $"                <div id=\"name\" class=\"innerNameValue\">{data[i].Name}</div>\r\n" +
+                    "            </div>\r\n" +
+                    "        </div>\r\n" +
+                    "        <div id=\"marker\" class=\"markerClass\"></div>\r\n" +
+                    "    </div>\r\n" +
+                    $"    <div id=\"best_lap_time\" class=\"lapTime resultsCell personalBest bestLapClass totalBest\">{data[i].BestLap}</div>\r\n" +
+                    "    <div id=\"laps\" class=\"resultsCell \">10</div>\r\n" +
+                    $"    <div id=\"last_lap_time_1\" class=\"lapTime resultsCell\">{data[i].Laps[data[i].Laps.Count() - 1]}</div>\r\n" +
+                    "    <div id=\"gap\" class=\"diffTime resultsCell\"></div>\r\n" +
+                    "</div>";
+                body.Append(str);
+                var laps = data[i].Laps;
+                for (int j = 0; j < laps.Count(); ++j)
                 {
-                    Console.WriteLine(response.StatusCode.ToString());
-                    return;
+                    str = "<div id=\"dataRow\" class=\"dataRow compid-1001 oddRow totalBest\" style=\"display: flex; position: static\" ontransitionend=\"resetZIndex(this);\">\r\n" +
+                        "    <div id=\"pos\" class=\"resultsCell totalBest\"></div>\r\n" +
+                       $"    <div id=\"num\" class=\"resultsCell\">{j}</div>\r\n" +
+                        "    <div id=\"name\" class=\"resultsCell \"></div>\r\n" +
+                       $"    <div id=\"best_lap_time\" class=\"lapTime resultsCell personalBest bestLapClass totalBest\">{laps[j]}</div>\r\n" +
+                        "    <div id=\"laps\" class=\"resultsCell \"></div>\r\n" +
+                        "    <div id=\"last_lap_time_1\" class=\"lapTime resultsCell\">48.794</div>\r\n" +
+                        "    <div id=\"gap\" class=\"diffTime resultsCell\"></div>\r\n" +
+                        "</div>";
+                    body.Append(str);
                 }
-                if (response == null)
-                    return;
-
-                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                content = OverwriteStylesLinks(content);
-
-                await File.WriteAllTextAsync(
-                    Path.Combine(GetCurrentStorageFolder(), $"Заезд-{new Random().Next(1, 10)}.html"),
-                    content);
             }
+            
+            return string.Format(template, body.ToString());
+        }
+        public async Task SaveCurrentSession(List<PilotProfile> data)
+        {
+
+            var htmlContent = SaveCurrentSession1(data);
+
+            await File.WriteAllTextAsync(
+                Path.Combine(GetCurrentStorageFolder(), $"Заезд-{new Random().Next(1, 10)}.html"),
+                htmlContent);
+            
         }
 
         private string OverwriteStylesLinks(string content)
@@ -49,16 +80,35 @@ namespace KartChronoWrapper.Services
             return dir.EnumerateFiles().Select(i => i.Name);
         }
 
-        public string WrapToPage(IEnumerable<string> sessions)
+        public async Task<string> WrapToPage(IEnumerable<string> sessions)
         {
-            var header = "<!DOCTYPE HTML>\r\n<html>\r\n<head>\r\n    <meta charset=\"utf-8\">\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/colors.css?v=1690359523'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/scoreboard2.css?v=1727079568'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/osd-stream.css?v=1694183475'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/nav.css?v=1632461511'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/records.css?v=1670413288'/>\r\n<link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/archive.css?v=1632316200'/>\r\n</head>\r\n<body>\r\n";
-            var footer= "</body>\r\n</html>";
+            var template = await File.ReadAllTextAsync("WebPages/sessionsTemplate.html");
             var body = new StringBuilder();
-            foreach (var i in sessions)
+            //foreach (var i in sessions)
+            for(int i = 0; i < sessions.Count(); ++i)
             {
-                body.Append($"<p><a href=\"getSession?date={DateTime.Today.ToShortDateString()}&name={i}\" >{i}</a></p>");
+                var str = "<div id=\"dataRow\" class=\"dataRow compid-1001 oddRow totalBest\" style=\"display: flex; position: static\" ontransitionend=\"resetZIndex(this);\">\r\n" +
+                        $"    <div id=\"pos\" class=\"resultsCell totalBest\">{i}</div>\r\n" +
+                        $"    <div id=\"num\" class=\"resultsCell\"></div>\r\n" +
+                        "    <div class=\"resultsCell compositeNameSectors \">\r\n" +
+                        "        <div class=\"compositeNameSectorsInner\">\r\n" +
+                        "            <div class=\"innerNameSectorsCell\" id=\"teamContainer\">\r\n" +
+                        "                <div id=\"team\" class=\"innerNameValue hidden\">&nbsp;</div>\r\n" +
+                        "            </div>\r\n" +
+                        "            <div class=\"innerNameSectorsCell\" id=\"nameContainer\">\r\n" +
+                        $"                <div id=\"name\" class=\"innerNameValue\">{sessions.ElementAt(i)}</div>\r\n" +
+                        "            </div>\r\n" +
+                        "        </div>\r\n" +
+                        "        <div id=\"marker\" class=\"markerClass\"></div>\r\n" +
+                        "    </div>\r\n" +
+                        $"    <div id=\"best_lap_time\" class=\"lapTime resultsCell personalBest bestLapClass totalBest\"></div>\r\n" +
+                        "    <div id=\"laps\" class=\"resultsCell \">10</div>\r\n" +
+                        $"    <div id=\"last_lap_time_1\" class=\"lapTime resultsCell\"></div>\r\n" +
+                        "    <div id=\"gap\" class=\"diffTime resultsCell\"></div>\r\n" +
+                        "</div>";
+                body.Append(str);
             }
-            return header + body.ToString() + footer;
+            return string.Format(template, body.ToString());
         }
 
         private string GetCurrentStorageFolder()

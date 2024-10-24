@@ -1,5 +1,6 @@
 using KartChronoWrapper.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace KartChronoWrapper.Controllers
 {
@@ -16,10 +17,40 @@ namespace KartChronoWrapper.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            var filePath = Path.Combine("index.html");
+            var filePath = Path.Combine("WebPages/index.html");
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound("HTML τΰιλ νε νΰιδεν.");
+                return NotFound("HTML Ρ„Π°ΠΉΠ» Π½Πµ Π½Π°ΠΉΠ΄ΠµΠ½.");
+            }
+            var htmlContent = await System.IO.File.ReadAllTextAsync(filePath);
+
+            return Content(htmlContent, "text/html");
+        }
+
+        //[HttpPost("SaveSession")]
+        //public IActionResult SaveSession()
+        //{
+        //    _remoteFilesService.SaveCurrentSession1();
+        //    return this.Ok();
+        //}
+
+        [HttpGet("GetSessionsList")]
+        public async Task<IActionResult> GetSessionsList()
+        {
+            var list = await _remoteFilesService.GetList();
+            var htmlContent = await _remoteFilesService.WrapToPage(list);
+
+            return Content(htmlContent, "text/html");
+        }
+
+        [HttpGet("GetSession")]
+        public async Task<IActionResult> GetSession([FromQuery]string name, [FromQuery]string strDate)
+        {
+            var date = DateTime.Parse(strDate);
+            var filePath = Path.Combine($"storage\\{date.ToShortDateString()}\\{name}");
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("HTML Ρ„Π°ΠΉΠ» Π½Πµ Π½Π°ΠΉΠ΄ΠµΠ½.");
             }
             var htmlContent = await System.IO.File.ReadAllTextAsync(filePath);
 
@@ -27,33 +58,18 @@ namespace KartChronoWrapper.Controllers
         }
 
         [HttpPost("SaveSession")]
-        public IActionResult SaveSession()
+        public async Task<IActionResult> GetSession()
         {
-            _remoteFilesService.SaveCurrentSession();
-            return this.Ok();
-        }
+            var ws = new WsDataLoader();
+            ws.LoadData();
 
-        [HttpGet("GetSessionsList")]
-        public async Task<IActionResult> GetSessionsList()
-        {
-            var list = await _remoteFilesService.GetList();
-            var htmlContent = _remoteFilesService.WrapToPage(list);
+            //await Task.Delay(5000);
+            //Console.WriteLine(JsonSerializer.Serialize(ws._pilots, new JsonSerializerOptions { WriteIndented = true }));
 
-            return Content(htmlContent, "text/html");
-        }
+            //var htmlContent = new RemoteFilesService().SaveCurrentSession(ws._pilots);
 
-        [HttpGet("GetSession")]
-        public async Task<IActionResult> GetSession([FromQuery]string name, string strDate)
-        {
-            var date = DateTime.Parse(strDate);
-            var filePath = Path.Combine($"storage\\{date.ToShortDateString()}\\{name}");
-            if (!System.IO.File.Exists(filePath))
-            {
-                return NotFound("HTML τΰιλ νε νΰιδεν.");
-            }
-            var htmlContent = await System.IO.File.ReadAllTextAsync(filePath);
+            return Ok();
 
-            return Content(htmlContent, "text/html");
         }
     }
 }

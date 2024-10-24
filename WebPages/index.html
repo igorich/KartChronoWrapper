@@ -45,10 +45,10 @@
                 .catch(error => console.error('Ошибка:', error));
         }
         function showSessions() {
-            $('#mainFrame').attr('src', '/home/getSessionsList');
+            $('#mainFrame').attr('src', '/home/GetSessionsList');
         }
         function showMainPage() {
-            $('#mainFrame').attr('src', 'https://stkmotor.kartchrono.com/online/?variant=monitor');
+            $('#mainFrame').attr('src', 'https://jekabpils.kartchrono.com/online/?variant=monitor');
         }
     </script>
     <link rel='stylesheet' href='https://stkmotor.kartchrono.com/css/colors.css?v=1690359523'/>
@@ -68,8 +68,7 @@
             <a class="buttonLink" href="#" onclick="showSessions(); return false;" >Сохранённые заезды</a>
         </div>
     </div>
-    <button id="changeSrc">Список сохранённых заездов</button>
-    <iframe id="mainFrame" src="https://stkmotor.kartchrono.com/online/?variant=monitor" align="left">
+    <iframe id="mainFrame" src="/home/GetSessionsList" align="left">
         Ваш браузер не поддерживает плавающие фреймы!
     </iframe>
 </body>

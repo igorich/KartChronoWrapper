@@ -4,4 +4,5 @@
 bin/
 obj/
 storage/
+test-data/
 .dockerignore
