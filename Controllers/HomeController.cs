@@ -1,6 +1,5 @@
 using KartChronoWrapper.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace KartChronoWrapper.Controllers
 {
@@ -11,7 +10,7 @@ namespace KartChronoWrapper.Controllers
         private IRemoteFilesService _remoteFilesService;
         public HomeController()
         {
-            _remoteFilesService = new RemoteFilesService();
+            _remoteFilesService = new S3FilesService();
         }
 
         [HttpGet("Index")]
@@ -22,23 +21,21 @@ namespace KartChronoWrapper.Controllers
             {
                 return NotFound("HTML файл не найден.");
             }
+            string? trackUrl = Environment.GetEnvironmentVariable("TRACK_URL");
+            if (trackUrl is null)
+                Console.WriteLine("Warning. No track url set.");
+
             var htmlContent = await System.IO.File.ReadAllTextAsync(filePath);
+            htmlContent = htmlContent.Replace("{{trackUrl}}", trackUrl);
 
             return Content(htmlContent, "text/html");
         }
-
-        //[HttpPost("SaveSession")]
-        //public IActionResult SaveSession()
-        //{
-        //    _remoteFilesService.SaveCurrentSession1();
-        //    return this.Ok();
-        //}
 
         [HttpGet("GetSessionsList")]
         public async Task<IActionResult> GetSessionsList()
         {
             var list = await _remoteFilesService.GetList();
-            var htmlContent = await _remoteFilesService.WrapToPage(list);
+            var htmlContent = await new HtmlService().WrapToPage(list);
 
             return Content(htmlContent, "text/html");
         }
@@ -58,15 +55,12 @@ namespace KartChronoWrapper.Controllers
         }
 
         [HttpPost("SaveSession")]
-        public async Task<IActionResult> GetSession()
+        public async Task<IActionResult> SaveSession()
         {
-            var ws = new WsDataLoader();
+            string? trackId = Environment.GetEnvironmentVariable("TRACK_ID");
+
+            var ws = trackId is null ? new WsDataLoader() : new WsDataLoader(trackId);// "1f3e81fc98c56b12aaeed4a1a4eb91cb");
             ws.LoadData();
-
-            //await Task.Delay(5000);
-            //Console.WriteLine(JsonSerializer.Serialize(ws._pilots, new JsonSerializerOptions { WriteIndented = true }));
-
-            //var htmlContent = new RemoteFilesService().SaveCurrentSession(ws._pilots);
 
             return Ok();
 

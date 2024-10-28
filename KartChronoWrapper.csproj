@@ -10,6 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="storage\**" />
+    <Compile Remove="test-data\**" />
+    <Content Remove="storage\**" />
+    <Content Remove="test-data\**" />
+    <EmbeddedResource Remove="storage\**" />
+    <EmbeddedResource Remove="test-data\**" />
+    <None Remove="storage\**" />
+    <None Remove="test-data\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove=".dockerignore" />
     <None Remove="Dockerfile" />
   </ItemGroup>

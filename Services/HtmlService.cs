@@ -3,7 +3,7 @@ using System.Text;
 
 namespace KartChronoWrapper.Services
 {
-    public class RemoteFilesService : IRemoteFilesService
+    public class HtmlService
     {
         public string SaveCurrentSession1(List<PilotProfile> data)
         {
@@ -50,34 +50,12 @@ namespace KartChronoWrapper.Services
 
             return string.Format(template, body.ToString());
         }
-        public async Task SaveCurrentSession(List<PilotProfile> data)
-        {
-
-            var htmlContent = SaveCurrentSession1(data);
-
-            await File.WriteAllTextAsync(
-                Path.Combine(GetCurrentStorageFolder(), $"Заезд-{new Random().Next(1, 10)}.html"),
-                htmlContent);
-
-        }
-
-        private string OverwriteStylesLinks(string content)
-        {
-            return content.Replace("href='/css/", "href='https://stkmotor.kartchrono.com/css/");
-        }
-
-        public async Task<IEnumerable<string>> GetList()
-        {
-            var dir = new DirectoryInfo(GetCurrentStorageFolder());
-
-            return dir.EnumerateFiles().Select(i => i.Name);
-        }
 
         public async Task<string> WrapToPage(IEnumerable<string> sessions)
         {
             var template = await File.ReadAllTextAsync("WebPages/sessionsTemplate.html");
             var body = new StringBuilder();
-            //foreach (var i in sessions)
+
             for (int i = 0; i < sessions.Count(); ++i)
             {
                 var str = "<div id=\"dataRow\" class=\"dataRow compid-1001 oddRow totalBest\" style=\"display: flex; position: static\" ontransitionend=\"resetZIndex(this);\">\r\n" +
@@ -102,18 +80,6 @@ namespace KartChronoWrapper.Services
                 body.Append(str);
             }
             return string.Format(template, body.ToString());
-        }
-
-        private string GetCurrentStorageFolder()
-        {
-            var folder = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "storage",
-                $"{DateTime.Today.ToShortDateString()}");
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
-
-            return folder;
         }
     }
 }

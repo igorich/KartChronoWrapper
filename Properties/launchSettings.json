@@ -25,7 +25,9 @@
       "launchBrowser": true,
       "launchUrl": "home/index",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "TRACK_ID": "1f3e81fc98c56b12aaeed4a1a4eb91cb",
+        "TRACK_URL": "https://jekabpils.kartchrono.com/online/"
       }
     },
     "Container (Dockerfile)": {

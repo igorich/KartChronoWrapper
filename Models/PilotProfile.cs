@@ -1,4 +1,4 @@
-﻿namespace KartChronoWrapper.Services
+﻿namespace KartChronoWrapper.Models
 {
     public class PilotProfile
     {
@@ -7,6 +7,6 @@
         public string KartNo { set; get; }
         public string BestLap { set; get; }
 
-        public List<string> Laps { set; get;}
+        public List<string> Laps { set; get; }
     }
 }

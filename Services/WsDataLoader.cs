@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using KartChronoWrapper.Models;
 using WebSocketSharp;
 
 namespace KartChronoWrapper.Services
@@ -13,7 +14,10 @@ namespace KartChronoWrapper.Services
 
         public  List<PilotProfile>? _pilots;
 
-        public WsDataLoader() : this("1f3e81fc98c56b12aaeed4a1a4eb91cb") { }
+        public WsDataLoader() : this("1f3e81fc98c56b12aaeed4a1a4eb91cb")
+        {
+            Console.WriteLine("No track id, failback to id jekabpils/1f3e81fc98c56b12aaeed4a1a4eb91cb");
+        }
 
         public WsDataLoader(string trackId)
         {
@@ -40,7 +44,6 @@ namespace KartChronoWrapper.Services
         {
             Console.WriteLine("Соединение закрыто.");
             _webSocket.Close();
-            //_webSocket.Dispose();
         }
 
         private void Ws_OnMessage(object? sender, MessageEventArgs e)
@@ -67,7 +70,7 @@ namespace KartChronoWrapper.Services
                     }
                 }
 
-                new RemoteFilesService().SaveCurrentSession(_pilots);
+                new S3FilesService().SaveCurrentSession(_pilots);
 
                 this.Close();
             }
@@ -117,7 +120,6 @@ namespace KartChronoWrapper.Services
                 resuls[user_id].Add(this.ConvertIntToLapTime(laptime));
             }
 
-            //Console.WriteLine(JsonSerializer.Serialize(resuls, new JsonSerializerOptions { WriteIndented = true }));
             return resuls;
         }
 
