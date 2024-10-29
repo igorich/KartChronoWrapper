@@ -25,6 +25,10 @@
         p {
             margin: 10px;
         }
+
+        body .advertHeader {
+            display: none;
+        }
     </style>
     <script>
         function saveSession() {
@@ -51,21 +55,21 @@
             $('#mainFrame').attr('src', '{{trackUrl}}');
         }
     </script>
-    <link rel='stylesheet' href='https://kartchrono.com/css/colors.css?v=1690359523'/>
-    <link rel='stylesheet' href='https://kartchrono.com/css/main.css?v=1696430736'/>
+    <link rel='stylesheet' href='https://kartchrono.com/css/colors.css?v=1690359523' />
+    <link rel='stylesheet' href='https://kartchrono.com/css/main.css?v=1696430736' />
 </head>
 <body>
-    <div id="buttons">
-            <!--p><a class="buttonLink" href="#" onclick="saveSession(); return false;" style="color:#ffffff;font-family: roboto condensed;">Сохранить заезд</a></p>
-            <p><a class="buttonLink" href="#" onclick="showSessions(); return false;" style="color:#ffffff;font-family: roboto condensed;">Список сохранённых заездов</a></p-->
-        <div class="buttonContainer">
-            <a class="buttonLink" href="#" onclick="showMainPage(); return false;" >Главная</a>
+    <div id="buttons" style="display: flex; width: 100%; align-items: start; flex-grow: 0">
+        <!--p><a class="buttonLink" href="#" onclick="saveSession(); return false;" style="color:#ffffff;font-family: roboto condensed;">Сохранить заезд</a></p>
+        <p><a class="buttonLink" href="#" onclick="showSessions(); return false;" style="color:#ffffff;font-family: roboto condensed;">Список сохранённых заездов</a></p-->
+        <div class="buttonContainer" style="height: fit-content">
+            <a class="buttonLink" href="#" onclick="showMainPage(); return false;">Главная</a>
         </div>
         <div class="buttonContainer">
-            <a class="buttonLink" href="#" onclick="saveSession(); return false;" >Сохранить заезд</a>
+            <a class="buttonLink" href="#" onclick="saveSession(); return false;">Сохранить заезд</a>
         </div>
         <div class="buttonContainer">
-            <a class="buttonLink" href="#" onclick="showSessions(); return false;" >Сохранённые заезды</a>
+            <a class="buttonLink" href="#" onclick="showSessions(); return false;">Сохранённые заезды</a>
         </div>
     </div>
     <iframe id="mainFrame" src="{{trackUrl}}" align="left">
