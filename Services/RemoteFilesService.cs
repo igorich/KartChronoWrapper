@@ -115,5 +115,10 @@ namespace KartChronoWrapper.Services
 
             return folder;
         }
+
+        public Task<string> GetSession(string key)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

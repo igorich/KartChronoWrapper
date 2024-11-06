@@ -43,15 +43,9 @@ namespace KartChronoWrapper.Controllers
         [HttpGet("GetSession")]
         public async Task<IActionResult> GetSession([FromQuery]string name, [FromQuery]string strDate)
         {
-            var date = DateTime.Parse(strDate);
-            var filePath = Path.Combine($"storage\\{date.ToShortDateString()}\\{name}");
-            if (!System.IO.File.Exists(filePath))
-            {
-                return NotFound("HTML файл не найден.");
-            }
-            var htmlContent = await System.IO.File.ReadAllTextAsync(filePath);
+            var content = await _remoteFilesService.GetSession(name);
 
-            return Content(htmlContent, "text/html");
+            return Content(content, "text/html");
         }
 
         [HttpPost("SaveSession")]

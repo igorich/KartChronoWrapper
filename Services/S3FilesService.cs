@@ -1,6 +1,8 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 using KartChronoWrapper.Models;
+using System.Text;
 
 namespace KartChronoWrapper.Services
 {
@@ -61,14 +63,40 @@ namespace KartChronoWrapper.Services
             return objectNames;
         }
 
-        public Task SaveCurrentSession(List<PilotProfile> htmlContent)
+        private static int _hack_counter = 0;
+        public async Task SaveCurrentSession(List<PilotProfile> data)
         {
-            throw new NotImplementedException();
+            var htmlContent = new HtmlService().SaveCurrentSession(data);
+
+            byte[] metadataBytes = Encoding.UTF8.GetBytes(htmlContent);
+            using (var fileTransferUtility = new TransferUtility(_s3Client))
+            using (var stream = new MemoryStream(metadataBytes))
+            {
+                await fileTransferUtility.UploadAsync(
+                    stream,
+                    _bucketName,
+                    $"storage/{DateTime.Today.ToShortDateString()}/Session-{_hack_counter}.html");
+                _hack_counter++;
+            }
         }
 
-        public Task<string> WrapToPage(IEnumerable<string> sessions)
+        public async Task<string> GetSession(string key)
         {
-            throw new NotImplementedException();
+            var rq = new GetObjectRequest()
+            {
+                BucketName = _bucketName,
+                Key = key,
+            };
+
+            using (GetObjectResponse response = await _s3Client.GetObjectAsync(rq))
+            {
+                using (StreamReader reader = new StreamReader(response.ResponseStream))
+                {
+                    string contents = reader.ReadToEnd();
+
+                    return contents;
+                }
+            }
         }
     }
 }

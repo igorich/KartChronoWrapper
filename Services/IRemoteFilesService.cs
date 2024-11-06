@@ -6,5 +6,6 @@ namespace KartChronoWrapper.Services
     {
         Task SaveCurrentSession(List<PilotProfile> htmlContent);
         Task<IEnumerable<string>> GetList();
+        Task<string> GetSession(string key);
     }
 }

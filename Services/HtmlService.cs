@@ -5,7 +5,7 @@ namespace KartChronoWrapper.Services
 {
     public class HtmlService
     {
-        public string SaveCurrentSession1(List<PilotProfile> data)
+        public string SaveCurrentSession(List<PilotProfile> data)
         {
             var template = File.ReadAllText("WebPages/SessionResults.html");
             var body = new StringBuilder();
