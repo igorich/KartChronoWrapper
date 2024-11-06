@@ -50,12 +50,20 @@ namespace KartChronoWrapper.Services
         {
             if (e.Data == null && !_binaryMessageReceived)
             {
-                _lapsTime = this.ProcessBinaryMessage(e.RawData);
+                try
+                {
+                    _lapsTime = this.ProcessBinaryMessage(e.RawData);
+                }
+                catch { }
                 _binaryMessageReceived = true;
             }
             else if (!_firstMessageReceived)
             {
-                _pilots = this.ProcessFirstMessage(e.Data);
+                try
+                {
+                    _pilots = this.ProcessFirstMessage(e.Data);
+                }
+                catch { }
                 _firstMessageReceived = true;
             }
 
