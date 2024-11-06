@@ -67,7 +67,9 @@ namespace KartChronoWrapper.Services
                         "                <div id=\"team\" class=\"innerNameValue hidden\">&nbsp;</div>\r\n" +
                         "            </div>\r\n" +
                         "            <div class=\"innerNameSectorsCell\" id=\"nameContainer\">\r\n" +
-                        $"                <div id=\"name\" class=\"innerNameValue\">{sessions.ElementAt(i)}</div>\r\n" +
+                        $"                <div id=\"name\" class=\"innerNameValue\">" +
+                        $"                     <a href=\"GetSession?name={sessions.ElementAt(i)}&strDate={DateTime.Today.ToShortDateString()}\">{sessions.ElementAt(i)}</a>" +
+                        "                </div>\r\n" +
                         "            </div>\r\n" +
                         "        </div>\r\n" +
                         "        <div id=\"marker\" class=\"markerClass\"></div>\r\n" +
