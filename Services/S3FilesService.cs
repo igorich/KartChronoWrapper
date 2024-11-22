@@ -2,6 +2,7 @@
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using KartChronoWrapper.Models;
+using Serilog;
 using System.Text;
 
 namespace KartChronoWrapper.Services
@@ -56,8 +57,7 @@ namespace KartChronoWrapper.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
-                //LoggerWrapper.Write(LogEventLevel.Error, ex, $"ListObjectsV2Request failed for {_bucketName} bucket, with [{prefix}] prefix");
+                Log.Error(ex, "GetList exception");
             }
 
             return objectNames;
@@ -75,7 +75,7 @@ namespace KartChronoWrapper.Services
                 await fileTransferUtility.UploadAsync(
                     stream,
                     _bucketName,
-                    $"storage/{DateTime.Today.ToShortDateString()}/Session-{_hack_counter}.html");
+                    $"storage/{DateTime.Today.ToShortDateString()}/Session-{_hack_counter}-{DateTime.Now.ToShortTimeString()}.html");
                 _hack_counter++;
             }
         }

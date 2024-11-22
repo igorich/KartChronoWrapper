@@ -1,22 +1,25 @@
 ﻿using System.Text.Json;
 using KartChronoWrapper.Models;
+using Serilog;
 using WebSocketSharp;
 
 namespace KartChronoWrapper.Services
 {
     public class WsDataLoader
     {
+        private const string _dataSourceUrl = "wss://kartchrono.com:9180";
+
         private bool _firstMessageReceived = false;
         private bool _binaryMessageReceived = false;
         private readonly string _trackId;
         private Dictionary<int, List<string>>? _lapsTime;
-        private WebSocket _webSocket;
+        private WebSocket? _webSocket = null;
 
         public  List<PilotProfile>? _pilots;
 
         public WsDataLoader() : this("1f3e81fc98c56b12aaeed4a1a4eb91cb")
         {
-            Console.WriteLine("No track id, failback to id jekabpils/1f3e81fc98c56b12aaeed4a1a4eb91cb");
+            Log.Warning("No track id, failback to id jekabpils/1f3e81fc98c56b12aaeed4a1a4eb91cb");
         }
 
         public WsDataLoader(string trackId)
@@ -25,68 +28,96 @@ namespace KartChronoWrapper.Services
         }
 
         public void LoadData()
-        {            
-            _webSocket = new WebSocket("wss://kartchrono.com:9180");
-            
-            _webSocket.OnOpen += (sender, e) =>
+        {
+            try
             {
-                var payload = new { trackId = _trackId };
-                _webSocket.Send(JsonSerializer.Serialize(payload));
-            };
-            _webSocket.OnMessage += this.Ws_OnMessage;
-            _webSocket.OnError += (sender, e) => { Console.WriteLine("Ошибка: " + e.Message); };
-            _webSocket.OnClose += (sender, e) => { Console.WriteLine("Соединение закрыто."); };
+                _webSocket = new WebSocket(_dataSourceUrl);
+                _webSocket.SslConfiguration.ServerCertificateValidationCallback =
+                      (sender, certificate, chain, sslPolicyErrors) => true;
 
-            _webSocket.Connect();            
+                _webSocket.OnOpen += (sender, e) =>
+                {
+                    try
+                    {
+                        var payload = new { trackId = _trackId };
+                        _webSocket.Send(JsonSerializer.Serialize(payload));
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "WebSocket failed OnOpen");
+                    }
+                };
+                _webSocket.OnMessage += this.Ws_OnMessage;
+                _webSocket.OnError += (sender, e) => { Log.Error("WebSocket error: " + e.Message); };
+                _webSocket.OnClose += (sender, e) => { Log.Debug("WebSocket connection closed."); };
+
+                _webSocket.Connect();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "WebSocket failed");
+            }
         }
 
         private void Close()
         {
-            Console.WriteLine("Соединение закрыто.");
-            _webSocket.Close();
+            Log.Debug("Wss connection closed.");
+            if(_webSocket is not null)
+                _webSocket.Close();
         }
 
         private void Ws_OnMessage(object? sender, MessageEventArgs e)
         {
-            if (e.Data == null && !_binaryMessageReceived)
+            try
             {
-                try
+                if (e.Data == null && !_binaryMessageReceived)
                 {
-                    _lapsTime = this.ProcessBinaryMessage(e.RawData);
-                }
-                catch { }
-                _binaryMessageReceived = true;
-            }
-            else if (!_firstMessageReceived)
-            {
-                try
-                {
-                    _pilots = this.ProcessFirstMessage(e.Data);
-                }
-                catch { }
-                _firstMessageReceived = true;
-            }
-
-            if (_firstMessageReceived && _binaryMessageReceived)
-            {
-                foreach (var session in _lapsTime)
-                {
-                    if (_pilots is not null && _pilots.Any(i => i.Id == session.Key.ToString()))
+                    try
                     {
-                        var p = _pilots.Where(i => i.Id == session.Key.ToString()).First();
-                        p.Laps = session.Value;
+                        _lapsTime = this.ProcessBinaryMessage(e.RawData);
                     }
+                    catch { }
+                    _binaryMessageReceived = true;
+                }
+                else if (!_firstMessageReceived)
+                {
+                    try
+                    {
+                        _pilots = this.ProcessFirstMessage(e.Data);
+                    }
+                    catch { }
+                    _firstMessageReceived = true;
                 }
 
-                new S3FilesService().SaveCurrentSession(_pilots);
+                if (_firstMessageReceived && _binaryMessageReceived)
+                {
+                    foreach (var session in _lapsTime!)
+                    {
+                        if (_pilots is not null && _pilots.Any(i => i.Id == session.Key.ToString()))
+                        {
+                            var p = _pilots.Where(i => i.Id == session.Key.ToString()).First();
+                            p.Laps = session.Value;
+                        }
+                    }
 
-                this.Close();
+                    if (_pilots is not null)
+                        _ = new S3FilesService().SaveCurrentSession(_pilots);
+
+                    this.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "WebSocket OnMessage");
             }
         }
 
-        private List<PilotProfile> ProcessFirstMessage(string jsonString)
+        private List<PilotProfile> ProcessFirstMessage(string? jsonString)
         {
             var pilots = new List<PilotProfile>();
+            if (string.IsNullOrEmpty(jsonString))
+                return pilots;
+
             //results -> [] -> 3, 4, 6
             using (JsonDocument document = JsonDocument.Parse(jsonString))
             {
@@ -123,7 +154,7 @@ namespace KartChronoWrapper.Services
 
                 var lapnumber = data[i + 6];
                 var laptime = data[i + 12];
-                Console.WriteLine($"{user_id} : {laptime}");
+                Log.Debug($"ProcessBinaryMessage (user:laptime): {user_id} : {laptime}");
 
                 resuls[user_id].Add(this.ConvertIntToLapTime(laptime));
             }
@@ -142,7 +173,7 @@ namespace KartChronoWrapper.Services
         private int[] ByteArrayToIntArray(byte[] byteArray)
         {
             if (byteArray.Length % 4 != 0)
-                throw new ArgumentException("Длина массива байт должна быть кратна 4.");
+                throw new ArgumentException("The length of the byte array must be a multiple of 4.");
 
             int[] intArray = new int[byteArray.Length / 4];
 

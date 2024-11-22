@@ -1,5 +1,11 @@
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .CreateLogger();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -7,13 +13,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-Console.WriteLine($"----==== Started {DateTime.Now} =====------");
-Console.WriteLine($"TRACK_ID: {Environment.GetEnvironmentVariable("TRACK_ID")}"
-    + $"TRACK_URL: {Environment.GetEnvironmentVariable("TRACK_URL")}"
-    + $"BUCKET_NAME: {Environment.GetEnvironmentVariable("BUCKET_NAME")}"
-    + $"TENANT_ID: {MaskSecretString(Environment.GetEnvironmentVariable("TENANT_ID"))}"
-    + $"ACCESS_KEY: {MaskSecretString(Environment.GetEnvironmentVariable("ACCESS_KEY"))}"
-    + $"SECRET_KEY: {MaskSecretString(Environment.GetEnvironmentVariable("SECRET_KEY"))}");
+Log.Debug($"----==== Started {DateTime.Now} =====------");
+Log.Debug($"TRACK_ID: {Environment.GetEnvironmentVariable("TRACK_ID")}\n"
+    + $"TRACK_URL: {Environment.GetEnvironmentVariable("TRACK_URL")}\n"
+    + $"BUCKET_NAME: {Environment.GetEnvironmentVariable("BUCKET_NAME")}\n"
+    + $"TENANT_ID: {MaskSecretString(Environment.GetEnvironmentVariable("TENANT_ID"))}\n"
+    + $"ACCESS_KEY: {MaskSecretString(Environment.GetEnvironmentVariable("ACCESS_KEY"))}\n"
+    + $"SECRET_KEY: {MaskSecretString(Environment.GetEnvironmentVariable("SECRET_KEY"))}\n");
 
 var app = builder.Build();
 

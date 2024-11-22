@@ -1,5 +1,6 @@
 using KartChronoWrapper.Services;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace KartChronoWrapper.Controllers
 {
@@ -23,7 +24,7 @@ namespace KartChronoWrapper.Controllers
             }
             string? trackUrl = Environment.GetEnvironmentVariable("TRACK_URL");
             if (trackUrl is null)
-                Console.WriteLine("Warning. No track url set.");
+                Log.Warning("Warning. No track url set.");
 
             var htmlContent = await System.IO.File.ReadAllTextAsync(filePath);
             htmlContent = htmlContent.Replace("{{trackUrl}}", trackUrl);
@@ -34,18 +35,18 @@ namespace KartChronoWrapper.Controllers
         [HttpGet("GetSessionsList")]
         public async Task<IActionResult> GetSessionsList()
         {
-            Console.WriteLine($"{DateTime.Now}: GetSessionsList called");
+            Log.Debug($"{DateTime.Now}: GetSessionsList called");
             try
             {
                 var list = await _remoteFilesService.GetList();
                 var htmlContent = await new HtmlService().WrapToPage(list);
-                Console.WriteLine($"{DateTime.Now}: GetSessionsList is fine");
+                Log.Debug($"{DateTime.Now}: GetSessionsList is fine");
 
                 return Content(htmlContent, "text/html");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Uncatched exception: {ex.Message}");
+                Log.Error($"Uncatched exception: {ex.Message}");
                 throw;
             }
         }
