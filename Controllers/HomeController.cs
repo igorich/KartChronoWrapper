@@ -34,10 +34,20 @@ namespace KartChronoWrapper.Controllers
         [HttpGet("GetSessionsList")]
         public async Task<IActionResult> GetSessionsList()
         {
-            var list = await _remoteFilesService.GetList();
-            var htmlContent = await new HtmlService().WrapToPage(list);
+            Console.WriteLine($"{DateTime.Now}: GetSessionsList called");
+            try
+            {
+                var list = await _remoteFilesService.GetList();
+                var htmlContent = await new HtmlService().WrapToPage(list);
+                Console.WriteLine($"{DateTime.Now}: GetSessionsList is fine");
 
-            return Content(htmlContent, "text/html");
+                return Content(htmlContent, "text/html");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Uncatched exception: {ex.Message}");
+                throw;
+            }
         }
 
         [HttpGet("GetSession")]
