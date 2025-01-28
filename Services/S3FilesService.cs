@@ -67,7 +67,10 @@ namespace KartChronoWrapper.Services
         public async Task SaveCurrentSession(List<PilotProfile> data)
         {
             var htmlContent = new HtmlService().SaveCurrentSession(data);
-
+            await SaveCurrentSession(htmlContent);
+        }
+        public async Task SaveCurrentSession(string htmlContent)
+        {
             byte[] metadataBytes = Encoding.UTF8.GetBytes(htmlContent);
             using (var fileTransferUtility = new TransferUtility(_s3Client))
             using (var stream = new MemoryStream(metadataBytes))

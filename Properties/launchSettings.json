@@ -23,11 +23,15 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "home/index",
+      "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "TRACK_ID": "1f3e81fc98c56b12aaeed4a1a4eb91cb",
-        "TRACK_URL": "https://jekabpils.kartchrono.com/online/"
+        "TRACK_URL": "https://jekabpils.kartchrono.com/online/",
+        "BUCKET_NAME": "chrono",
+        "TENANT_ID": "c1165d6d-8a04-43bc-8e14-dda79e9d2ff9",
+        "ACCESS_KEY": "3df3f67e7b3c7871c4a202c69cf2da0e",
+        "SECRET_KEY": "7e597d822ba0ea77a0008da5ed9baf2a"
       }
     },
     "Container (Dockerfile)": {
