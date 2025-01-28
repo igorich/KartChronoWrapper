@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    image: kartchronowrapper:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  https-portal:
+    image: steveltn/https-portal:latest
+    container_name: https-portal
+    restart: unless-stopped
+    ports:
+      - "80:80"   # HTTP-порт для перенаправления на HTTPS
+      - "443:443" # HTTPS-порт
+    environment:
+      DOMAINS: "example.com -> http://app:8080" # Замените example.com на ваш домен
+      STAGE: "production" # Используйте "staging" для тестирования, чтобы избежать лимитов Let's Encrypt
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
