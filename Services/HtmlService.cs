@@ -68,7 +68,8 @@ namespace KartChronoWrapper.Services
                         "            </div>\r\n" +
                         "            <div class=\"innerNameSectorsCell\" id=\"nameContainer\">\r\n" +
                         $"                <div id=\"name\" class=\"innerNameValue\">" +
-                        $"                     <a href=\"GetSession?name={sessions.ElementAt(i)}&strDate={DateTime.Today.ToShortDateString()}\">{sessions.ElementAt(i)}</a>" +
+                        $"                     <a class=\"innerNameLink\" " +
+                        $"                         href=\"GetSession?name={sessions.ElementAt(i)}&strDate={DateTime.Today.ToShortDateString()}\">{sessions.ElementAt(i)}</a>" +
                         "                </div>\r\n" +
                         "            </div>\r\n" +
                         "        </div>\r\n" +
@@ -81,7 +82,7 @@ namespace KartChronoWrapper.Services
                         "</div>";
                 body.Append(str);
             }
-            return string.Format(template, body.ToString());
+            return template.Replace("{0}", body.ToString());
         }
     }
 }
