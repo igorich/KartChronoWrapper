@@ -64,11 +64,11 @@ namespace KartChronoWrapper.Controllers
         {
             string? trackId = Environment.GetEnvironmentVariable("TRACK_ID");
 
-            var ws = trackId is null ? new WsDataLoader() : new WsDataLoader(trackId);// "1f3e81fc98c56b12aaeed4a1a4eb91cb");
-            ws.LoadData();
+            var ws = new WsDataLoader();
+            //var ws = new SeleniumPageSaver();
+            await ws.SaveSession();
 
             return Ok();
-
         }
     }
 }

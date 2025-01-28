@@ -1,39 +1,48 @@
-﻿using System.Text.Json;
-using KartChronoWrapper.Models;
+﻿using KartChronoWrapper.Models;
 using Serilog;
+using System.Net;
+using System.Text.Json;
 using WebSocketSharp;
 
 namespace KartChronoWrapper.Services
 {
-    public class WsDataLoader
+    public class WsDataLoader : ISaveSessionService
     {
         private const string _dataSourceUrl = "wss://kartchrono.com:9180";
 
         private bool _firstMessageReceived = false;
         private bool _binaryMessageReceived = false;
-        private readonly string _trackId;
+        private string _trackId;
         private Dictionary<int, List<string>>? _lapsTime;
         private WebSocket? _webSocket = null;
 
         public  List<PilotProfile>? _pilots;
 
-        public WsDataLoader() : this("1f3e81fc98c56b12aaeed4a1a4eb91cb")
+        public WsDataLoader()
         {
-            Log.Warning("No track id, failback to id jekabpils/1f3e81fc98c56b12aaeed4a1a4eb91cb");
+            _trackId = Environment.GetEnvironmentVariable("TRACK_ID") ?? "1f3e81fc98c56b12aaeed4a1a4eb91cb";
+            //Log.Warning("No track id, failback to id jekabpils/1f3e81fc98c56b12aaeed4a1a4eb91cb");
         }
 
-        public WsDataLoader(string trackId)
+        public Task SaveSession()
         {
-            _trackId = trackId;
+            this.LoadData();
+
+            return Task.CompletedTask;
         }
 
         public void LoadData()
         {
             try
             {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
                 _webSocket = new WebSocket(_dataSourceUrl);
-                _webSocket.SslConfiguration.ServerCertificateValidationCallback =
-                      (sender, certificate, chain, sslPolicyErrors) => true;
+                _webSocket.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.None;
+                _webSocket.SslConfiguration.CheckCertificateRevocation = false;
+
+                _webSocket.SslConfiguration.ServerCertificateValidationCallback = 
+                    (sender, certificate, chain, sslPolicyErrors) => true;
 
                 _webSocket.OnOpen += (sender, e) =>
                 {
