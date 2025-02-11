@@ -41,7 +41,7 @@ namespace KartChronoWrapper.Services
             ListObjectsV2Request request = new ListObjectsV2Request
             {
                 BucketName = _bucketName,
-                Prefix = "",
+                Prefix = $"storage/{DateTime.Today.ToString("yyyy-MM-dd")}/",
             };
 
             ListObjectsV2Response response;
@@ -78,7 +78,7 @@ namespace KartChronoWrapper.Services
                 await fileTransferUtility.UploadAsync(
                     stream,
                     _bucketName,
-                    $"storage/{DateTime.Today.ToShortDateString()}/Session-{_hack_counter}-{DateTime.Now.ToShortTimeString()}.html");
+                    $"storage/{DateTime.Today.ToString("yyyy-MM-dd")}/Session-{_hack_counter}-{DateTime.Now.ToString("mm:ss")}.html");
                 _hack_counter++;
             }
         }

@@ -12,6 +12,7 @@ namespace KartChronoWrapper.Services
             //foreach (var i in data)
             for (int i = 0; i < data.Count(); ++i)
             {
+                var bestLapAsTime = TimeSpan.FromMilliseconds(double.Parse(data[i].BestLap)).ToString(@"mm\:ss\.fff");
                 var str = "<div id=\"dataRow\" class=\"dataRow compid-1001 oddRow totalBest\" style=\"display: flex; position: static\" ontransitionend=\"resetZIndex(this);\">\r\n" +
                     $"    <div id=\"pos\" class=\"resultsCell totalBest\">{i}</div>\r\n" +
                     $"    <div id=\"num\" class=\"resultsCell\">{data[i].KartNo}</div>\r\n" +
@@ -26,7 +27,7 @@ namespace KartChronoWrapper.Services
                     "        </div>\r\n" +
                     "        <div id=\"marker\" class=\"markerClass\"></div>\r\n" +
                     "    </div>\r\n" +
-                    $"    <div id=\"best_lap_time\" class=\"lapTime resultsCell personalBest bestLapClass totalBest\">{data[i].BestLap}</div>\r\n" +
+                    $"    <div id=\"best_lap_time\" class=\"lapTime resultsCell personalBest bestLapClass totalBest\">{bestLapAsTime}</div>\r\n" +
                     "    <div id=\"laps\" class=\"resultsCell \">10</div>\r\n" +
                     $"    <div id=\"last_lap_time_1\" class=\"lapTime resultsCell\">{data[i].Laps[data[i].Laps.Count() - 1]}</div>\r\n" +
                     "    <div id=\"gap\" class=\"diffTime resultsCell\"></div>\r\n" +
@@ -109,7 +110,7 @@ namespace KartChronoWrapper.Services
             var folder = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "storage",
-                $"{DateTime.Today.ToShortDateString()}");
+                $"{DateTime.Today.ToString("yyyy-MM-dd")}");
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
