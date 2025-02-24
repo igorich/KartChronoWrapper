@@ -78,7 +78,7 @@ namespace KartChronoWrapper.Services
                 await fileTransferUtility.UploadAsync(
                     stream,
                     _bucketName,
-                    $"storage/{DateTime.Today.ToString("yyyy-MM-dd")}/Session-{_hack_counter}-{DateTime.Now.ToString("mm:ss")}.html");
+                    $"storage/{DateTime.Today.ToString("yyyy-MM-dd")}/Session-{_hack_counter}-{DateTime.Now.ToString("hh:mm:ss")}.html");
                 _hack_counter++;
             }
         }

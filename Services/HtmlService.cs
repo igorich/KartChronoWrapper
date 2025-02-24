@@ -1,6 +1,5 @@
 ﻿using KartChronoWrapper.Models;
 using System.Text;
-using System;
 
 namespace KartChronoWrapper.Services
 {
@@ -10,40 +9,46 @@ namespace KartChronoWrapper.Services
         {
             var template = File.ReadAllText("WebPages/SessionResults.html");
             var body = new StringBuilder();
-            //foreach (var i in data)
+
             for (int i = 0; i < data.Count(); ++i)
             {
-                var bestLapAsTime = TimeSpan.FromMilliseconds(double.Parse(data[i].BestLap)).ToString(@"mm\:ss\.fff");
+                var laps = data[i].Laps;
+                var bestLapAsInt = int.Parse(data[i].BestLap);
+                var bestLapAsTime = TimeSpan.FromMilliseconds(bestLapAsInt).ToString(@"mm\:ss\.fff");
+                var lastLap = TimeSpan.FromMilliseconds(laps.Last()).ToString(@"mm\:ss\.fff");
                 var str = "<div id=\"dataRow\" class=\"dataRow compid-1001 oddRow totalBest\" style=\"display: flex; position: static\" ontransitionend=\"resetZIndex(this);\">\r\n" +
-                    $"    <div id=\"pos\" class=\"resultsCell totalBest\">{i}</div>\r\n" +
-                    $"    <div id=\"num\" class=\"resultsCell\">{data[i].KartNo}</div>\r\n" +
+                   $"    <div id=\"pos\" class=\"resultsCell totalBest\">{i}</div>\r\n" +
+                   $"    <div id=\"num\" class=\"resultsCell\">#{data[i].KartNo}</div>\r\n" +
                     "    <div class=\"resultsCell compositeNameSectors \">\r\n" +
                     "        <div class=\"compositeNameSectorsInner\">\r\n" +
                     "            <div class=\"innerNameSectorsCell\" id=\"teamContainer\">\r\n" +
                     "                <div id=\"team\" class=\"innerNameValue hidden\">&nbsp;</div>\r\n" +
                     "            </div>\r\n" +
                     "            <div class=\"innerNameSectorsCell\" id=\"nameContainer\">\r\n" +
-                    $"                <div id=\"name\" class=\"innerNameValue\">{data[i].Name}</div>\r\n" +
+                   $"                <div id=\"name\" class=\"innerNameValue\">{data[i].Name ?? "Прокат"}</div>\r\n" +
                     "            </div>\r\n" +
                     "        </div>\r\n" +
                     "        <div id=\"marker\" class=\"markerClass\"></div>\r\n" +
                     "    </div>\r\n" +
-                    $"    <div id=\"best_lap_time\" class=\"lapTime resultsCell personalBest bestLapClass totalBest\">{bestLapAsTime}</div>\r\n" +
-                    "    <div id=\"laps\" class=\"resultsCell \">10</div>\r\n" +
-                    $"    <div id=\"last_lap_time_1\" class=\"lapTime resultsCell\">{data[i].Laps[data[i].Laps.Count() - 1]}</div>\r\n" +
+                   $"    <div id=\"best_lap_time\" class=\"lapTime resultsCell personalBest bestLapClass totalBest\">{bestLapAsTime}</div>\r\n" +
+                   $"    <div id=\"laps\" class=\"resultsCell \">{laps.Count(i => i > 0)}</div>\r\n" +
+                   $"    <div id=\"last_lap_time_1\" class=\"lapTime resultsCell\">{lastLap}</div>\r\n" +
                     "    <div id=\"gap\" class=\"diffTime resultsCell\"></div>\r\n" +
                     "</div>";
                 body.Append(str);
-                var laps = data[i].Laps;
                 for (int j = 0; j < laps.Count(); ++j)
                 {
+                    if (laps[j] == 0)
+                        continue;
+                    var style = (bestLapAsInt == laps[j]) ? "personalBest" : string.Empty;
+                    var lapAsTime = TimeSpan.FromMilliseconds(laps[j]).ToString(@"mm\:ss\.fff");
                     str = "<div id=\"dataRow\" class=\"dataRow compid-1001 oddRow totalBest\" style=\"display: flex; position: static\" ontransitionend=\"resetZIndex(this);\">\r\n" +
                         "    <div id=\"pos\" class=\"resultsCell totalBest\"></div>\r\n" +
-                       $"    <div id=\"num\" class=\"resultsCell\">{j}</div>\r\n" +
-                        "    <div id=\"name\" class=\"resultsCell \"></div>\r\n" +
-                       $"    <div id=\"best_lap_time\" class=\"lapTime resultsCell personalBest bestLapClass totalBest\">{laps[j]}</div>\r\n" +
-                        "    <div id=\"laps\" class=\"resultsCell \"></div>\r\n" +
-                        "    <div id=\"last_lap_time_1\" class=\"lapTime resultsCell\">48.794</div>\r\n" +
+                       $"    <div id=\"num\" class=\"\">{j + 1}</div>\r\n" +
+                        "    <div id=\"name\" class=\" \"></div>\r\n" +
+                       $"    <div id=\"best_lap_time\" class=\"lapTime  \"></div>\r\n" +
+                        "    <div id=\"laps\" class=\" \"></div>\r\n" +
+                       $"    <div id=\"last_lap_time_1\" class=\"lapTime {style}\">{lapAsTime}</div>\r\n" +
                         "    <div id=\"gap\" class=\"diffTime resultsCell\"></div>\r\n" +
                         "</div>";
                     body.Append(str);

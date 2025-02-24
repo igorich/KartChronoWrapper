@@ -13,7 +13,7 @@ namespace KartChronoWrapper.Services
         private bool _firstMessageReceived = false;
         private bool _binaryMessageReceived = false;
         private string _trackId;
-        private Dictionary<int, List<string>>? _lapsTime;
+        private Dictionary<int, List<int>>? _lapsTime;
         private WebSocket? _webSocket = null;
 
         public  List<PilotProfile>? _pilots;
@@ -137,46 +137,42 @@ namespace KartChronoWrapper.Services
                 {
                     var p = new PilotProfile()
                     {
-                        Name = node.Value.GetProperty("4").ToString(),
+                        Name = string.IsNullOrEmpty(node.Value.GetProperty("4").ToString()) 
+                            ? node.Value.GetProperty("21").ToString()
+                            : node.Value.GetProperty("4").ToString(),
                         Id = node.Name,
                         BestLap = node.Value.GetProperty("6").ToString(),
                         KartNo = node.Value.GetProperty("3").ToString(),
                     };
                     pilots.Add(p);
                 }
+                if (pilots.Count > 0 && pilots[0] is not null)
+                    pilots[0].RaceTitle = root.GetProperty("104").ToString();
             }
 
             return pilots;
         }
 
-        private Dictionary<int, List<string>> ProcessBinaryMessage(byte[] byteData)
+        private Dictionary<int, List<int>> ProcessBinaryMessage(byte[] byteData)
         {
             var data = this.ByteArrayToIntArray(byteData);
-            var resuls = new Dictionary<int, List<string>>();
+            var resuls = new Dictionary<int, List<int>>();
             int offset = 11;
 
             for (int i = offset; i < data.Length - 12; i += 13)
             {
                 var user_id = data[i + 4];
                 if (!resuls.ContainsKey(user_id))
-                    resuls.Add(user_id, new List<string>());
+                    resuls.Add(user_id, new List<int>());
 
                 var lapnumber = data[i + 6];
                 var laptime = data[i + 12];
                 Log.Debug($"ProcessBinaryMessage (user:laptime): {user_id} : {laptime}");
 
-                resuls[user_id].Add(this.ConvertIntToLapTime(laptime));
+                resuls[user_id].Add(laptime);
             }
 
             return resuls;
-        }
-
-        private string ConvertIntToLapTime(int time)
-        {
-            if (time == 0)
-                return string.Empty;
-
-            return time.ToString().Insert(2, ",");
         }
 
         private int[] ByteArrayToIntArray(byte[] byteArray)

@@ -7,6 +7,7 @@
         public string KartNo { set; get; }
         public string BestLap { set; get; }
 
-        public List<string> Laps { set; get; }
+        public List<int> Laps { set; get; }
+        public string RaceTitle { get; internal set; }
     }
 }
