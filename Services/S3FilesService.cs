@@ -35,13 +35,13 @@ namespace KartChronoWrapper.Services
             );
         }
 
-        public async Task<IEnumerable<string>> GetList()
+        public async Task<IEnumerable<string>> GetList(DateTime date)
         {
             var objectNames = new List<string>();
             ListObjectsV2Request request = new ListObjectsV2Request
             {
                 BucketName = _bucketName,
-                Prefix = $"storage/{DateTime.Today.ToString("yyyy-MM-dd")}/",
+                Prefix = $"storage/{date.ToString("yyyy-MM-dd")}/",
             };
 
             ListObjectsV2Response response;

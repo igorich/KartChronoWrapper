@@ -7,7 +7,7 @@ namespace KartChronoWrapper.Services
     {
         public string SaveCurrentSession(List<PilotProfile> data)
         {
-            var template = File.ReadAllText("WebPages/SessionResults.html");
+            var template = File.ReadAllText("WebPages/sessionResultTemplate.html");
             var body = new StringBuilder();
 
             for (int i = 0; i < data.Count(); ++i)
@@ -30,7 +30,7 @@ namespace KartChronoWrapper.Services
                     "        </div>\r\n" +
                     "        <div id=\"marker\" class=\"markerClass\"></div>\r\n" +
                     "    </div>\r\n" +
-                   $"    <div id=\"best_lap_time\" class=\"lapTime resultsCell personalBest bestLapClass totalBest\">{bestLapAsTime}</div>\r\n" +
+                   $"    <div id=\"best_lap_time\" class=\"resultsCell \">{bestLapAsTime}</div>\r\n" +
                    $"    <div id=\"laps\" class=\"resultsCell \">{laps.Count(i => i > 0)}</div>\r\n" +
                    $"    <div id=\"last_lap_time_1\" class=\"lapTime resultsCell\">{lastLap}</div>\r\n" +
                     "    <div id=\"gap\" class=\"diffTime resultsCell\"></div>\r\n" +
@@ -58,9 +58,9 @@ namespace KartChronoWrapper.Services
             return string.Format(template, body.ToString());
         }
 
-        public async Task<string> WrapToPage(IEnumerable<string> sessions)
+        public async Task<string> WrapToPage(IEnumerable<string> sessions, DateTime selectedDate)
         {
-            var template = await File.ReadAllTextAsync("WebPages/sessionsTemplate.html");
+            var template = await File.ReadAllTextAsync("WebPages/sessionListTemplate.html");
             var body = new StringBuilder();
 
             for (int i = 0; i < sessions.Count(); ++i)
@@ -80,7 +80,7 @@ namespace KartChronoWrapper.Services
                         "            <div class=\"innerNameSectorsCell\" id=\"nameContainer\">\r\n" +
                         $"                <div id=\"name\" class=\"innerNameValue\">" +
                         $"                     <a class=\"innerNameLink\" " +
-                        $"                         href=\"GetSession?name={sessions.ElementAt(i)}&strDate={DateTime.Today.ToString("yyyy-MM-dd")}\">{sessionTitle}</a>" +
+                        $"                         href=\"GetSession?name={sessions.ElementAt(i)}&strDate={selectedDate.ToString("yyyy-MM-dd")}\">{sessionTitle}</a>" +
                         "                </div>\r\n" +
                         "            </div>\r\n" +
                         "        </div>\r\n" +

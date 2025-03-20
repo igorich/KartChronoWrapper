@@ -5,7 +5,7 @@ namespace KartChronoWrapper.Services
 {
     public class RemoteFilesService : IRemoteFilesService
     {
-        public string SaveCurrentSession1(List<PilotProfile> data)
+        /*public string SaveCurrentSession1(List<PilotProfile> data)
         {
             var template = File.ReadAllText("WebPages/SessionResults.html");
             var body = new StringBuilder();
@@ -51,6 +51,7 @@ namespace KartChronoWrapper.Services
 
             return string.Format(template, body.ToString());
         }
+
         public async Task SaveCurrentSession(List<PilotProfile> data)
         {
 
@@ -59,17 +60,22 @@ namespace KartChronoWrapper.Services
             await File.WriteAllTextAsync(
                 Path.Combine(GetCurrentStorageFolder(), $"Заезд-{new Random().Next(1, 10)}.html"),
                 htmlContent);
-
         }
 
         private string OverwriteStylesLinks(string content)
         {
             return content.Replace("href='/css/", "href='https://stkmotor.kartchrono.com/css/");
         }
+        */
 
-        public async Task<IEnumerable<string>> GetList()
+        public async Task SaveCurrentSession(List<PilotProfile> data)
         {
-            var dir = new DirectoryInfo(GetCurrentStorageFolder());
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<string>> GetList(DateTime date)
+        {
+            var dir = new DirectoryInfo(GetCurrentStorageFolder(date));
 
             return dir.EnumerateFiles().Select(i => i.Name);
         }
@@ -105,12 +111,12 @@ namespace KartChronoWrapper.Services
             return string.Format(template, body.ToString());
         }
 
-        private string GetCurrentStorageFolder()
+        private string GetCurrentStorageFolder(DateTime date)
         {
             var folder = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "storage",
-                $"{DateTime.Today.ToString("yyyy-MM-dd")}");
+                $"{date.ToString("yyyy-MM-dd")}");
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 

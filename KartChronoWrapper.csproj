@@ -39,10 +39,10 @@
     <None Update="WebPages\index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="WebPages\SessionResults.html">
+    <None Update="WebPages\sessionResultTemplate.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="WebPages\sessionsTemplate.html">
+    <None Update="WebPages\sessionListTemplate.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

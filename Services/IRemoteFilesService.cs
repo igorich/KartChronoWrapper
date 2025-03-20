@@ -4,8 +4,8 @@ namespace KartChronoWrapper.Services
 {
     public interface IRemoteFilesService
     {
-        Task SaveCurrentSession(List<PilotProfile> htmlContent);
-        Task<IEnumerable<string>> GetList();
+        Task<IEnumerable<string>> GetList(DateTime date);
         Task<string> GetSession(string key);
+        Task SaveCurrentSession(List<PilotProfile> htmlContent);
     }
 }

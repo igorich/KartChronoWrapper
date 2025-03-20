@@ -6,10 +6,10 @@ namespace KartChronoWrapper.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class HomeController : Controller
+    public class ApiController : Controller
     {
         private IRemoteFilesService _remoteFilesService;
-        public HomeController()
+        public ApiController()
         {
             _remoteFilesService = new S3FilesService();
         }
@@ -33,13 +33,13 @@ namespace KartChronoWrapper.Controllers
         }
 
         [HttpGet("GetSessionsList")]
-        public async Task<IActionResult> GetSessionsList()
+        public async Task<IActionResult> GetSessionsList([FromQuery]DateTime date)
         {
             Log.Debug($"{DateTime.Now}: GetSessionsList called");
             try
             {
-                var list = await _remoteFilesService.GetList();
-                var htmlContent = await new HtmlService().WrapToPage(list);
+                var list = await _remoteFilesService.GetList(date);
+                var htmlContent = await new HtmlService().WrapToPage(list, date);
                 Log.Debug($"{DateTime.Now}: GetSessionsList is fine");
 
                 return Content(htmlContent, "text/html");

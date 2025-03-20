@@ -23,7 +23,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "home\\index",
+      "launchUrl": "api\\index",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "TRACK_ID": "51a0ce74c8690969d43925106c97d0da",
