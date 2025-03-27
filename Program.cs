@@ -28,11 +28,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/home/index");
+        return;
+    }
+    await next();
+});
 
 app.MapControllers();
 
