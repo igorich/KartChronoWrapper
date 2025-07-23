@@ -66,8 +66,16 @@ namespace KartChronoWrapper.Services
         private static int _hack_counter = 0;
         public async Task SaveCurrentSession(List<PilotProfile> data)
         {
-            var htmlContent = new HtmlService().SaveCurrentSession(data);
-            await SaveCurrentSession(htmlContent);
+            try
+            {
+                var htmlContent = new HtmlService().SaveCurrentSession(data);
+                await SaveCurrentSession(htmlContent);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error on saving data to html");
+                throw;
+            }
         }
         public async Task SaveCurrentSession(string htmlContent)
         {
@@ -78,7 +86,7 @@ namespace KartChronoWrapper.Services
                 await fileTransferUtility.UploadAsync(
                     stream,
                     _bucketName,
-                    $"storage/{DateTime.Today.ToString("yyyy-MM-dd")}/Session-{_hack_counter}-{DateTime.Now.ToString("hh:mm:ss")}.html");
+                    $"storage/{DateTime.Today.ToString("yyyy-MM-dd")}/Session-{_hack_counter}-{DateTime.Now.ToString("hh-mm-ss")}.html");
                 _hack_counter++;
             }
         }

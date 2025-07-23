@@ -13,6 +13,8 @@ namespace KartChronoWrapper.Services
             for (int i = 0; i < data.Count(); ++i)
             {
                 var laps = data[i].Laps;
+                if (laps is null)
+                    continue;
                 var bestLapAsInt = int.Parse(data[i].BestLap);
                 var bestLapAsTime = TimeSpan.FromMilliseconds(bestLapAsInt).ToString(@"mm\:ss\.fff");
                 var lastLap = TimeSpan.FromMilliseconds(laps.Last()).ToString(@"mm\:ss\.fff");
